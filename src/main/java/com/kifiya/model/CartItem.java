@@ -1,8 +1,6 @@
 // src/main/java/com/kifiya/model/CartItem.java
 package com.kifiya.model;
 
-import java.math.BigDecimal;
-
 import jakarta.persistence.*;
 import lombok.Data;
 
