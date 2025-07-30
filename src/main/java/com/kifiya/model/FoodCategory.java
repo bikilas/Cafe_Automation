@@ -1,3 +1,4 @@
+
 package com.kifiya.model;
 
 import jakarta.persistence.*;

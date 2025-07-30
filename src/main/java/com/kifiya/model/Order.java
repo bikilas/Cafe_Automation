@@ -42,7 +42,8 @@ public class Order {
 
     private Boolean isSeasonal;
 
-    private String paymentMethod;
+    @Enumerated(EnumType.STRING)
+    private PaymentMethod paymentMethod;
 
     private String deliveryAddress;
 

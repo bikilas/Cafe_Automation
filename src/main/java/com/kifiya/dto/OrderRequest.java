@@ -1,24 +1,16 @@
 package com.kifiya.dto;
 
 import com.kifiya.model.PaymentMethod;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class OrderDto {
-    private Long id;
+public class OrderRequest {
     private Long userId;
-    private Long cafeId;
-    private BigDecimal totalAmount; // Changed from Long to BigDecimal
+    private BigDecimal totalAmount;
     private String status;
-    private LocalDateTime createdAt;
     private Long totalItems;
     private Boolean isAvailable;
     private Boolean isVegetarian;
@@ -26,5 +18,15 @@ public class OrderDto {
     private PaymentMethod paymentMethod;
     private String deliveryAddress;
     private String deliveryInstructions;
-    private List<OrderItemDto> items;
+    private List<OrderItemRequest> items;
+    private Long cafeId;
+
+    @Data
+    public static class OrderItemRequest {
+        private Long foodId;
+        private String foodName;
+        private BigDecimal price;
+        private Integer quantity;
+        private String notes;
+    }
 }

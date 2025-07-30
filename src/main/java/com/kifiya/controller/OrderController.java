@@ -1,6 +1,7 @@
 package com.kifiya.controller;
 
 import com.kifiya.dto.OrderDto;
+import com.kifiya.dto.OrderRequest;
 import com.kifiya.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -31,9 +32,45 @@ public class OrderController {
     
     // Create new order
     @PostMapping
-    public ResponseEntity<OrderDto> createOrder(@RequestBody OrderDto orderDto) {
-        OrderDto createdOrder = orderService.createOrder(orderDto);
-        return ResponseEntity.ok(createdOrder);
+    public ResponseEntity<?> createOrder(@RequestBody OrderRequest orderRequest) {
+        try {
+            // Create new OrderDto and map all fields from OrderRequest
+            OrderDto orderDto = new OrderDto();
+            
+            // Required fields
+            if (orderRequest.getUserId() == null || orderRequest.getCafeId() == null || 
+                orderRequest.getTotalAmount() == null || orderRequest.getPaymentMethod() == null) {
+                return ResponseEntity.badRequest().body("Missing required fields: userId, cafeId, totalAmount, and paymentMethod are required");
+            }
+            
+            orderDto.setUserId(orderRequest.getUserId());
+            orderDto.setCafeId(orderRequest.getCafeId());
+            orderDto.setTotalAmount(orderRequest.getTotalAmount());
+            orderDto.setPaymentMethod(orderRequest.getPaymentMethod());
+            
+            // Optional fields with null checks and default values
+            orderDto.setStatus(orderRequest.getStatus() != null ? orderRequest.getStatus() : "PENDING");
+            orderDto.setTotalItems(orderRequest.getTotalItems() != null ? orderRequest.getTotalItems() : 0L);
+            orderDto.setIsAvailable(orderRequest.getIsAvailable() != null ? orderRequest.getIsAvailable() : true);
+            orderDto.setIsVegetarian(orderRequest.getIsVegetarian() != null ? orderRequest.getIsVegetarian() : false);
+            orderDto.setIsSeasonal(orderRequest.getIsSeasonal() != null ? orderRequest.getIsSeasonal() : false);
+            
+            if (orderRequest.getDeliveryAddress() != null) {
+                orderDto.setDeliveryAddress(orderRequest.getDeliveryAddress());
+            }
+            if (orderRequest.getDeliveryInstructions() != null) {
+                orderDto.setDeliveryInstructions(orderRequest.getDeliveryInstructions());
+            }
+            
+            // Create the order using the service
+            OrderDto createdOrder = orderService.createOrder(orderDto);
+            return new ResponseEntity<>(createdOrder, org.springframework.http.HttpStatus.CREATED);
+            
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error creating order: " + e.getMessage());
+        }
     }
     
     // Update order

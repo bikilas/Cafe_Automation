@@ -33,22 +33,36 @@ public class OrderService {
     
     // Create operation
     public OrderDto createOrder(OrderDto orderDto) {
+        // Validate required fields
+        if (orderDto == null) {
+            throw new IllegalArgumentException("Order data cannot be null");
+        }
+        
+        // Validate payment method
+        if (orderDto.getPaymentMethod() == null) {
+            throw new IllegalArgumentException("Payment method is required");
+        }
+        
+        // Validate user exists
         User user = userRepository.findById(orderDto.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + orderDto.getUserId()));
         
+        // Validate cafe exists
         Cafe cafe = cafeRepository.findById(orderDto.getCafeId())
                 .orElseThrow(() -> new RuntimeException("Cafe not found with id: " + orderDto.getCafeId()));
         
+        // Create and populate order
         Order order = new Order();
         order.setUser(user);
         order.setCafe(cafe);
-        order.setTotalAmount(orderDto.getTotalAmount());
-        order.setStatus(orderDto.getStatus());
-        order.setTotalItems(orderDto.getTotalItems());
-        order.setIsAvailable(orderDto.getIsAvailable());
-        order.setIsVegetarian(orderDto.getIsVegetarian());
-        order.setIsSeasonal(orderDto.getIsSeasonal());
+        order.setTotalAmount(orderDto.getTotalAmount() != null ? orderDto.getTotalAmount() : BigDecimal.ZERO);
+        order.setStatus(orderDto.getStatus() != null ? orderDto.getStatus() : "PENDING");
+        order.setTotalItems(orderDto.getTotalItems() != null ? orderDto.getTotalItems() : 0L);
+        order.setIsAvailable(orderDto.getIsAvailable() != null ? orderDto.getIsAvailable() : true);
+        order.setIsVegetarian(orderDto.getIsVegetarian() != null ? orderDto.getIsVegetarian() : false);
+        order.setIsSeasonal(orderDto.getIsSeasonal() != null ? orderDto.getIsSeasonal() : false);
         order.setPaymentMethod(orderDto.getPaymentMethod());
+        order.setCreatedAt(java.time.LocalDateTime.now());
         
         // Set delivery address if provided
         if (orderDto.getDeliveryAddress() != null) {
